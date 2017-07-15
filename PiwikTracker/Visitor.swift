@@ -20,16 +20,17 @@ struct Visitor {
 }
 
 extension Visitor {
-    static func current() -> Visitor {
+    static func current(in piwikUserDefaults: PiwikUserDefaults) -> Visitor {
+        var piwikUserDefaults = piwikUserDefaults
         let id: String
-        if let existingId = PiwikUserDefaults.standard.clientId {
+        if let existingId = piwikUserDefaults.clientId {
             id = existingId
         } else {
             let newId = newVisitorID()
-            PiwikUserDefaults.standard.clientId = newId
+            piwikUserDefaults.clientId = newId
             id = newId
         }
-        let userId = PiwikUserDefaults.standard.visitorUserId
+        let userId = piwikUserDefaults.visitorUserId
         return Visitor(id: id, userId: userId)
     }
     
