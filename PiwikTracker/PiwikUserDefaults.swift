@@ -83,7 +83,24 @@ internal struct PiwikUserDefaults {
 }
 
 extension PiwikUserDefaults {
-    fileprivate struct Key {
+    internal mutating func migrateFromNilSuite() {
+        guard !userDefaults.bool(forKey: "didMigrateFromNilSuite") else {
+            // no migration necessary
+            return
+        }
+        totalNumberOfVisits = UserDefaults.standard.integer(forKey: PiwikUserDefaults.Key.totalNumberOfVisits)
+        firstVisit = UserDefaults.standard.object(forKey: PiwikUserDefaults.Key.firstVistsTimestamp) as? Date
+        previousVisit = UserDefaults.standard.object(forKey: PiwikUserDefaults.Key.previousVistsTimestamp) as? Date
+        currentVisit = UserDefaults.standard.object(forKey: PiwikUserDefaults.Key.currentVisitTimestamp) as? Date
+        optOut = UserDefaults.standard.bool(forKey: PiwikUserDefaults.Key.optOut)
+        clientId = UserDefaults.standard.string(forKey: PiwikUserDefaults.Key.clientID)
+        visitorUserId = UserDefaults.standard.string(forKey: PiwikUserDefaults.Key.visitorUserID)
+        userDefaults.set(true, forKey: "didMigrateFromNilSuite")
+    }
+}
+
+extension PiwikUserDefaults {
+    internal struct Key {
         static let totalNumberOfVisits = "PiwikTotalNumberOfVistsKey"
         static let currentVisitTimestamp = "PiwikCurrentVisitTimestampKey"
         static let previousVistsTimestamp = "PiwikPreviousVistsTimestampKey"
