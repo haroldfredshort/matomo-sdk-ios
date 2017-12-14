@@ -19,9 +19,8 @@ class ViewController: NSViewController {
     
     override func viewDidAppear() {
         super.viewDidAppear()
-        PiwikTracker.configureSharedInstance(withSiteID: "<id>", baseURL: URL(string:"http://example.com/piwik.php")!)
-        PiwikTracker.shared?.track(view: ["start"])
-        PiwikTracker.shared?.dispatch()
+        PiwikTracker.shared.track(view: ["start"])
+        PiwikTracker.shared.dispatch()
     }
 
     override var representedObject: Any? {

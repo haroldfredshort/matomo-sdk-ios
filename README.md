@@ -18,22 +18,33 @@ pod 'PiwikTracker', '~> 4.4'
 Then run `pod install`. In every file you want to use the PiwikTracker, don't forget to import the framework with `import PiwikTracker`.
 
 ## Usage
-### Configuration
+### Piwik Instance
 
-Before the first usage, the PiwikTracker has to be configured. This is best done in the `application(_:, didFinishLaunchingWithOptions:)` method in the `AppDelegate`.
+The Piwik iOS SDK doesn't provide a instance of the PiwikTracker. In order to be able to track data you have to create an instance first.
 
 ```
-PiwikTracker.configureSharedInstance(withSiteID: "5", baseURL: URL(string: "http://your.server.org/path-to-piwik/piwik.php")!)
+let piwikTracker = PiwikTracker(siteId: "23", baseURL: URL(string: "https://demo2.piwik.org/piwik.php")!)
 ```
+
 
 The `siteId` is the ID that you can get if you [add a website](https://piwik.org/docs/manage-websites/#add-a-website) within the Piwik web interface. The `baseURL` it the URL to your Piwik web instance and has to include the "piwik.php" string.
+
+You can either pass around this instance, or add an extension to the `PiwikTracker` class and add a shared instance property.
+
+```
+extension PiwikTracker {
+    static let shared: PiwikTracker = PiwikTracker(siteId: "1", baseURL: URL(string: "https://example.com/piwik.php")!)
+}
+```
+
+You can use multiple instances within one application.
 
 #### Opting Out
 
 The PiwikTracker SDK supports opting out of tracking. Please use the `isOptedOut` property of the PiwikTracker to define if the user opted out of tracking.
 
 ```
-PiwikTracker.shared?.isOptedOut = true
+piwikTracker.isOptedOut = true
 ```
 
 ### Tracking Page Views
@@ -41,13 +52,13 @@ PiwikTracker.shared?.isOptedOut = true
 The PiwikTracker can track hierarchical screen names, e.g. screen/settings/register. Use this to create a hierarchical and logical grouping of screen views in the Piwik web interface.
 
 ```
-PiwikTracker.shared?.track(view: ["path","to","your","page"])
+piwikTracker.track(view: ["path","to","your","page"])
 ```
 
 You can also set the url of the page.
 ```
 let url = URL(string: "https://piwik.org/get-involved/")
-PiwikTracker.shared?.track(view: ["community","get-involved"], url: url)
+piwikTracker.track(view: ["community","get-involved"], url: url)
 ```
 
 ### Tracking Events
@@ -60,7 +71,7 @@ Events can be used to track user interactions such as taps on a button. An event
 - Value (optional)
 
 ```
-PiwikTracker.shared?.track(eventWithCategory: "player", action: "slide", name: "volume", value: 35.1)
+piwikTracker.track(eventWithCategory: "player", action: "slide", name: "volume", value: 35.1)
 ```
 
 This will log that the user slid the volume slider on the player to 35.1%.
@@ -72,23 +83,23 @@ The Piwik SDK currently supports Custom Dimensions for the Visit Scope. Using Cu
 After that you can set a new Dimension,
 
 ```
-PiwikTracker.shared?.set(value: "1.0.0-beta2", forIndex: 1)
+piwikTracker.set(value: "1.0.0-beta2", forIndex: 1)
 ```
 
 or remove an already set dimension.
 
 ```
-PiwikTracker.shared?.remove(dimensionAtIndex: 1)
+piwikTracker.remove(dimensionAtIndex: 1)
 ```
 
 Dimensions in the Visit Scope will be sent along every Page View or Event. Custom Dimensions are not persisted by the SDK and have to be re-configured upon application startup.
 
 ### Custom User ID
 
-To add a [custom User ID](https://piwik.org/docs/user-id/), simply set the value you'd like to use on the `visitorId` field of the shared tracker:
+To add a [custom User ID](https://piwik.org/docs/user-id/), simply set the value you'd like to use on the `visitorId` field of the tracker:
 
 ```
-PiwikTracker.shared?.visitorId = "coolUsername123"
+piwikTracker.visitorId = "coolUsername123"
 ```
 
 All future events being tracked by the SDK will be associated with this userID, as opposed to the default UUID created for each Visitor.
@@ -100,7 +111,7 @@ The PiwikTracker will dispatch events every 30 seconds automatically. If you wan
 
 ```
 func applicationDidEnterBackground(_ application: UIApplication) {
-  PiwikTracker.shared?.dispatch()
+  piwikTracker.dispatch()
 }
 ```
 
@@ -110,7 +121,7 @@ The PiwikTracker starts a new session whenever the application starts. If you wa
 
 ```
 func applicationWillEnterForeground(_ application: UIApplication) {
-  PiwikTracker.shared?.startNewSession()
+  piwikTracker.startNewSession()
 }
 ```
 
@@ -119,11 +130,11 @@ func applicationWillEnterForeground(_ application: UIApplication) {
 The PiwikTracker per default logs `warning` and `error` messages to the console. You can change the `LogLevel`.
 
 ```
-PiwikTracker.shared?.logger = DefaultLogger(minLevel: .verbose)
-PiwikTracker.shared?.logger = DefaultLogger(minLevel: .debug)
-PiwikTracker.shared?.logger = DefaultLogger(minLevel: .info)
-PiwikTracker.shared?.logger = DefaultLogger(minLevel: .warning)
-PiwikTracker.shared?.logger = DefaultLogger(minLevel: .error)
+piwikTracker.logger = DefaultLogger(minLevel: .verbose)
+piwikTracker.logger = DefaultLogger(minLevel: .debug)
+piwikTracker.logger = DefaultLogger(minLevel: .info)
+piwikTracker.logger = DefaultLogger(minLevel: .warning)
+piwikTracker.logger = DefaultLogger(minLevel: .error)
 ```
 
 You can also write your own `Logger` and send the logs wherever you want. Just write a new class/struct an let it conform to the `Logger` protocol.
@@ -133,7 +144,7 @@ The `PiwikTracker` will create a default user agent derived from the WKWebView u
 You can instantiate the `PiwikTracker` using your own user agent.
 
 ```
-PiwikTracker.configureSharedInstance(withSiteID: "5", baseURL: URL(string: "http://your.server.org/path-to-piwik/piwik.php")!, userAgent: "Your custom user agent")
+let piwikTracker = PiwikTracker(siteId: "23", baseURL: URL(string: "https://demo2.piwik.org/piwik.php")!, userAgent: "Your custom user agent")
 ```
 
 ### Objective-C compatibility
@@ -141,10 +152,11 @@ PiwikTracker.configureSharedInstance(withSiteID: "5", baseURL: URL(string: "http
 Version 4 of this SDK is written in Swift, but you can use it in your Objective-C project as well. If you don't want to update you can still use the unsupported older [version 3](https://github.com/piwik/piwik-sdk-ios/tree/version-3). Using the Swift SDK from Objective-C should be pretty straight forward.
 
 ```
-[PiwikTracker configureSharedInstanceWithSiteID:@"5" baseURL:[NSURL URLWithString:@"http://your.server.org/path-to-piwik/piwik.php"] userAgent:nil];
-[PiwikTracker shared] trackWithView:@[@"example"] url:nil];
-[[PiwikTracker shared] trackWithEventWithCategory:@"category" action:@"action" name:nil number:nil];
-[[PiwikTracker shared] dispatch];
+PiwikTracker *piwikTracker = [[PiwikTracker alloc] initWithSiteId:@"5" baseURL:[NSURL URLWithString:@"http://example.com/piwik.php"] userAgent:nil];
+[piwikTracker trackWithView:@[@"example"] url:nil];
+[piwikTracker trackWithEventWithCategory:@"category" action:@"action" name:nil number:nil url:nil];
+[piwikTracker dispatch];
+piwikTracker.logger = [[DefaultLogger alloc] initWithMinLevel:LogLevelVerbose];
 ```
 
 ### Sending custom events
@@ -153,10 +165,9 @@ Instead of using the convenience functions for events and screen views for examp
 
 ```
 func sendCustomEvent() {
-  guard let piwikTracker = PiwikTracker.shared else { return }
   let downloadURL = URL(string: "https://builds.piwik.org/piwik.zip")!
   let event = Event(tracker: piwikTracker, action: ["menu", "custom tracking parameters"], url: downloadURL, customTrackingParameters: ["download": downloadURL.absoluteString])
-  PiwikTracker.shared?.track(event)
+  piwikTracker.track(event)
 }
 ```
 
@@ -180,7 +191,6 @@ Please read [CONTRIBUTING.md](https://github.com/piwik/piwik-sdk-ios/blob/swift3
 
 - Basic functionality
   - [Persisting non dispatched events](https://github.com/piwik/piwik-sdk-ios/issues/137)
-  - [Custom Dimensions](https://github.com/piwik/piwik-sdk-ios/issues/111) (Action Scope is not implemented yet)
 - Tracking of more things
   - Exceptions
   - Social Interactions

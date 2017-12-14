@@ -83,19 +83,14 @@ internal struct PiwikUserDefaults {
 }
 
 extension PiwikUserDefaults {
-    internal mutating func migrateFromNilSuite() {
-        guard !userDefaults.bool(forKey: "didMigrateFromNilSuite") else {
-            // no migration necessary
-            return
-        }
-        totalNumberOfVisits = UserDefaults.standard.integer(forKey: PiwikUserDefaults.Key.totalNumberOfVisits)
-        firstVisit = UserDefaults.standard.object(forKey: PiwikUserDefaults.Key.firstVistsTimestamp) as? Date
-        previousVisit = UserDefaults.standard.object(forKey: PiwikUserDefaults.Key.previousVistsTimestamp) as? Date
-        currentVisit = UserDefaults.standard.object(forKey: PiwikUserDefaults.Key.currentVisitTimestamp) as? Date
-        optOut = UserDefaults.standard.bool(forKey: PiwikUserDefaults.Key.optOut)
-        clientId = UserDefaults.standard.string(forKey: PiwikUserDefaults.Key.clientID)
-        visitorUserId = UserDefaults.standard.string(forKey: PiwikUserDefaults.Key.visitorUserID)
-        userDefaults.set(true, forKey: "didMigrateFromNilSuite")
+    public mutating func copy(from userDefaults: UserDefaults) {
+        totalNumberOfVisits = userDefaults.integer(forKey: PiwikUserDefaults.Key.totalNumberOfVisits)
+        firstVisit = userDefaults.object(forKey: PiwikUserDefaults.Key.firstVistsTimestamp) as? Date
+        previousVisit = userDefaults.object(forKey: PiwikUserDefaults.Key.previousVistsTimestamp) as? Date
+        currentVisit = userDefaults.object(forKey: PiwikUserDefaults.Key.currentVisitTimestamp) as? Date
+        optOut = userDefaults.bool(forKey: PiwikUserDefaults.Key.optOut)
+        clientId = userDefaults.string(forKey: PiwikUserDefaults.Key.clientID)
+        visitorUserId = userDefaults.string(forKey: PiwikUserDefaults.Key.visitorUserID)
     }
 }
 

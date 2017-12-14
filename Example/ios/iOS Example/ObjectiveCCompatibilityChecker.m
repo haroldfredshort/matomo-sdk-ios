@@ -5,15 +5,16 @@
 @implementation ObjectiveCCompatibilityChecker
 
 - (void)check {
-    [PiwikTracker configureSharedInstanceWithSiteID:@"5" baseURL:[NSURL URLWithString:@"http://example.com/piwik.php"] userAgent:nil];
-    [[PiwikTracker shared] trackWithView:@[@"example"] url:nil];
-    [[PiwikTracker shared] trackWithEventWithCategory:@"category" action:@"action" name:nil number:nil url:nil];
-    [[PiwikTracker shared] dispatch];
-    [PiwikTracker shared].logger = [[DefaultLogger alloc] initWithMinLevel:LogLevelVerbose];
+    PiwikTracker *piwikTracker = [[PiwikTracker alloc] initWithSiteId:@"5" baseURL:[NSURL URLWithString:@"http://example.com/piwik.php"] userAgent:nil];
+    [piwikTracker trackWithView:@[@"example"] url:nil];
+    [piwikTracker trackWithEventWithCategory:@"category" action:@"action" name:nil number:nil url:nil];
+    [piwikTracker dispatch];
+    piwikTracker.logger = [[DefaultLogger alloc] initWithMinLevel:LogLevelVerbose];
 }
 
 - (void)checkDeprecated {
-    [[PiwikTracker shared] trackWithEventWithCategory:@"category" action:@"action" name:nil number:nil];
+    PiwikTracker *piwikTracker = [[PiwikTracker alloc] initWithSiteId:@"5" baseURL:[NSURL URLWithString:@"http://example.com/piwik.php"] userAgent:nil];
+    [piwikTracker trackWithEventWithCategory:@"category" action:@"action" name:nil number:nil];
 }
 
 @end

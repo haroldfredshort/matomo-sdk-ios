@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+* **feature** It now is possible to use multiple PiwikTracker instances within one appliaction. Please check [this](todo) guide how to migrate from the shared instance in version 4.4 [#164](https://github.com/piwik/piwik-sdk-ios/pull/164)
+
 ## 4.4.0
 * **feature** Added a way to add custom dimension in the action scope. [#111](https://github.com/piwik/piwik-sdk-ios/issues/111)
 * **feature** Added automatic generation of the url property. [#197](https://github.com/piwik/piwik-sdk-ios/issues/197)
